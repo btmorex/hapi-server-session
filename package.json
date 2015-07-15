@@ -17,6 +17,9 @@
     "hoek": "2.x.x",
     "node-uuid": "1.4.x"
   },
+  "devDependencies": {
+    "hapi": "8.x.x"
+  },
   "peerDependencies": {
     "hapi": "8.x.x"
   }

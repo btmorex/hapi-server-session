@@ -1,0 +1,23 @@
+{
+  "name": "hapi-server-session",
+  "version": "1.0.0",
+  "description": "Simple server-side session support for hapi",
+  "keywords": [
+    "hapi",
+    "plugin",
+    "server",
+    "session"
+  ],
+  "bugs": "https://github.com/btmorex/hapi-server-session/issues",
+  "license": "MIT",
+  "author": "Avery Fay <avery@shadypixel.com> (https://averyfay.com/)",
+  "main": "index.js",
+  "repository": "git://github.com/btmorex/hapi-server-session",
+  "dependencies": {
+    "hoek": "2.x.x",
+    "node-uuid": "1.4.x"
+  },
+  "peerDependencies": {
+    "hapi": "8.x.x"
+  }
+}

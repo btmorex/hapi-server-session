@@ -1,9 +1,9 @@
 'use strict';
 
-var crypto = require('crypto');
-var hoek = require('hoek');
+const crypto = require('crypto');
+const hoek = require('hoek');
 
-var defaultOptions = {
+const defaultOptions = {
   algorithm: 'sha256',
   cache: {
     segment: 'session',
@@ -25,19 +25,19 @@ function register(server, options, next) {
 
   server.state(options.name, options.cookie);
 
-  var cache = server.cache(options.cache);
+  const cache = server.cache(options.cache);
 
   function createSessionId(randomBytes, expiresAt) {
-    var sessionId = [randomBytes || crypto.randomBytes(options.size)];
+    const sessionId = [randomBytes || crypto.randomBytes(options.size)];
 
     if (options.expiresIn) {
-      var buffer = new Buffer(8);
+      const buffer = new Buffer(8);
       buffer.writeDoubleBE(expiresAt || Date.now() + options.expiresIn);
       sessionId.push(buffer);
     }
 
     if (options.key) {
-      var hmac = crypto.createHmac(options.algorithm, options.key);
+      const hmac = crypto.createHmac(options.algorithm, options.key);
       sessionId.forEach(function (value) {
         hmac.update(value);
       });
@@ -48,9 +48,9 @@ function register(server, options, next) {
   }
 
   function isValidSessionId(sessionId) {
-    var decodedSessionId = hoek.base64urlDecode(sessionId, 'buffer');
-    var randomBytes = decodedSessionId.slice(0, options.size);
-    var expiresAt;
+    const decodedSessionId = hoek.base64urlDecode(sessionId, 'buffer');
+    const randomBytes = decodedSessionId.slice(0, options.size);
+    let expiresAt;
     if (options.expiresIn) {
       expiresAt = decodedSessionId.readDoubleBE(options.size);
       if (Date.now() >= expiresAt) {
@@ -70,7 +70,7 @@ function register(server, options, next) {
       return reply.continue();
     }
 
-    var sessionId = request.state[options.name];
+    const sessionId = request.state[options.name];
     if (sessionId) {
       if (isValidSessionId(sessionId)) {
         return cache.get(sessionId, attachSession);
@@ -85,7 +85,7 @@ function register(server, options, next) {
     if (hoek.deepEqual(request.session, request._session)) {
       return reply.continue();
     }
-    var sessionId = request.state[options.name];
+    let sessionId = request.state[options.name];
     if (!sessionId) {
       try {
         sessionId = createSessionId();

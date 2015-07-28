@@ -22,14 +22,17 @@
     "url": "https://github.com/btmorex/hapi-server-session.git"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test-cov": "istanbul cover --dir test/coverage node_modules/.bin/_mocha"
   },
   "dependencies": {
     "hoek": "^2.14.0",
     "when": "^3.7.3"
   },
   "devDependencies": {
-    "hapi": "^8.8.0"
+    "hapi": "^8.8.0",
+    "istanbul": "^0.3.17",
+    "mocha": "^2.2.5"
   },
   "peerDependencies": {
     "hapi": "^8.8.0"

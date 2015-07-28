@@ -11,7 +11,7 @@ server.connection({
 });
 
 server.register({
-  register: require('./index.js'),
+  register: require('../index.js'),
   options: {
     cookieOptions: {
       isSecure: false,

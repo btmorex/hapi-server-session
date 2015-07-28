@@ -25,7 +25,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "hoek": "^2.14.0"
+    "hoek": "^2.14.0",
+    "when": "^3.7.3"
   },
   "devDependencies": {
     "hapi": "^8.8.0"

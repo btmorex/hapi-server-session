@@ -2,6 +2,7 @@
 
 const crypto = require('crypto');
 const hoek = require('hoek');
+const node = require('when/node');
 
 const defaultOptions = {
   algorithm: 'sha256',
@@ -29,13 +30,11 @@ function register(server, options, next) {
 
   function createSessionId(randomBytes, expiresAt) {
     const sessionId = [randomBytes || crypto.randomBytes(options.size)];
-
     if (options.expiresIn) {
       const buffer = new Buffer(8);
       buffer.writeDoubleBE(expiresAt || Date.now() + options.expiresIn);
       sessionId.push(buffer);
     }
-
     if (options.key) {
       const hmac = crypto.createHmac(options.algorithm, options.key);
       sessionId.forEach(function (value) {
@@ -43,7 +42,6 @@ function register(server, options, next) {
       });
       sessionId.push(hmac.digest());
     }
-
     return hoek.base64urlEncode(Buffer.concat(sessionId));
   }
 
@@ -61,45 +59,50 @@ function register(server, options, next) {
   }
 
   server.ext('onPreAuth', function loadSession(request, reply) {
-    function attachSession(err, value) {
-      if (err) {
-        reply(err);
-      }
-      request.session = value != null ? value : {};
-      request._session = hoek.clone(request.session);
-      return reply.continue();
-    }
-
     const sessionId = request.state[options.name];
     if (sessionId) {
       if (isValidSessionId(sessionId)) {
-        return cache.get(sessionId, attachSession);
+        node.call(cache.get.bind(cache), sessionId)
+          .catch(function (err) {
+            reply(err);
+          })
+          .done(function (value) {
+            request.session = value != null ? value : {};
+            request._session = hoek.clone(request.session);
+            reply.continue();
+          });
+        return;
       } else {
         reply.unstate(options.name);
       }
     }
-    return attachSession();
+    request.session = {};
+    request._session = {};
+    reply.continue();
   });
 
-  server.ext('onPreResponse', function saveSession(request, reply) {
+  server.ext('onPreResponse', function storeSession(request, reply) {
     if (hoek.deepEqual(request.session, request._session)) {
-      return reply.continue();
+      reply.continue();
+      return;
     }
     let sessionId = request.state[options.name];
     if (!sessionId) {
       try {
         sessionId = createSessionId();
       } catch (err) {
-        return reply(err);
+        reply(err);
+        return;
       }
       reply.state(options.name, sessionId);
     }
-    cache.set(sessionId, request.session, 0, function (err) {
-      if (err) {
-        return reply(err);
-      }
-      return reply.continue();
-    });
+    node.call(cache.set.bind(cache), sessionId, request.session, 0)
+      .catch(function (err) {
+        reply(err);
+      })
+      .done(function () {
+        reply.continue();
+      });
   });
 
   next();

@@ -1,63 +1,112 @@
+'use strict';
+
+var crypto = require('crypto');
 var hoek = require('hoek');
-var uuid = require('node-uuid');
 
 var defaultOptions = {
-  cacheOptions: {
-    expiresIn: 24 * 60 * 60 * 1000,
-    segment: 'session'
+  algorithm: 'sha256',
+  cache: {
+    segment: 'session',
   },
-  cookie: 's',
-  cookieOptions: {
+  cookie: {
     isSecure: true,
-    isHttpOnly: true
-  }
+    isHttpOnly: true,
+  },
+  expiresIn: 24 * 60 * 60 * 1000,
+  name: 'id',
+  size: 16,
 };
 
-exports.register = function (server, options, next) {
+function register(server, options, next) {
   options = hoek.applyToDefaults(defaultOptions, options);
+  if (options.expiresIn && typeof options.cache.expiresIn === 'undefined') {
+    options.cache.expiresIn = options.expiresIn;
+  }
 
-  server.state(options.cookie, options.cookieOptions);
+  server.state(options.name, options.cookie);
 
-  var cache = server.cache(options.cacheOptions);
+  var cache = server.cache(options.cache);
 
-  server.ext('onPreAuth', function (request, reply) {
-    var attachSession = function (err, value) {
+  function createSessionId(randomBytes, expiresAt) {
+    var sessionId = [randomBytes || crypto.randomBytes(options.size)];
+
+    if (options.expiresIn) {
+      var buffer = new Buffer(8);
+      buffer.writeDoubleBE(expiresAt || Date.now() + options.expiresIn);
+      sessionId.push(buffer);
+    }
+
+    if (options.key) {
+      var hmac = crypto.createHmac(options.algorithm, options.key);
+      sessionId.forEach(function (value) {
+        hmac.update(value);
+      });
+      sessionId.push(hmac.digest());
+    }
+
+    return hoek.base64urlEncode(Buffer.concat(sessionId));
+  }
+
+  function isValidSessionId(sessionId) {
+    var decodedSessionId = hoek.base64urlDecode(sessionId, 'buffer');
+    var randomBytes = decodedSessionId.slice(0, options.size);
+    var expiresAt;
+    if (options.expiresIn) {
+      expiresAt = decodedSessionId.readDoubleBE(options.size);
+      if (Date.now() >= expiresAt) {
+        return false;
+      }
+    }
+    return sessionId === createSessionId(randomBytes, expiresAt);
+  }
+
+  server.ext('onPreAuth', function loadSession(request, reply) {
+    function attachSession(err, value) {
       if (err) {
         reply(err);
       }
       request.session = value != null ? value : {};
       request._session = hoek.clone(request.session);
-      reply.continue();
-    };
-    var sessionId = request.state[options.cookie];
-    if (sessionId) {
-      cache.get(sessionId, attachSession);
-    } else {
-      attachSession();
+      return reply.continue();
     }
+
+    var sessionId = request.state[options.name];
+    if (sessionId) {
+      if (isValidSessionId(sessionId)) {
+        return cache.get(sessionId, attachSession);
+      } else {
+        reply.unstate(options.name);
+      }
+    }
+    return attachSession();
   });
 
-  server.ext('onPreResponse', function (request, reply) {
+  server.ext('onPreResponse', function saveSession(request, reply) {
     if (hoek.deepEqual(request.session, request._session)) {
-      reply.continue();
-    } else {
-      var sessionId = request.state[options.cookie];
-      if (!sessionId) {
-        sessionId = uuid.v4();
-        reply.state(options.cookie, sessionId);
-      }
-      cache.set(sessionId, request.session, 0, function (err) {
-        if (err) {
-          reply(err);
-        }
-        reply.continue();
-      });
+      return reply.continue();
     }
+    var sessionId = request.state[options.name];
+    if (!sessionId) {
+      try {
+        sessionId = createSessionId();
+      } catch (err) {
+        return reply(err);
+      }
+      reply.state(options.name, sessionId);
+    }
+    cache.set(sessionId, request.session, 0, function (err) {
+      if (err) {
+        return reply(err);
+      }
+      return reply.continue();
+    });
   });
 
   next();
+}
+
+register.attributes = {
+  pkg: require('./package.json'),
 };
 
-exports.register.attributes = {
-  pkg: require('./package.json')
-};
+exports.register = register;

@@ -8,19 +8,29 @@
     "server",
     "session"
   ],
+  "homepage": "https://github.com/btmorex/hapi-server-session",
   "bugs": "https://github.com/btmorex/hapi-server-session/issues",
   "license": "MIT",
-  "author": "Avery Fay <avery@shadypixel.com> (https://averyfay.com/)",
+  "author": {
+    "name": "Avery Fay",
+    "email": "avery@shadypixel.com",
+    "url": "https://averyfay.com/"
+  },
   "main": "index.js",
-  "repository": "git://github.com/btmorex/hapi-server-session",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/btmorex/hapi-server-session.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
   "dependencies": {
-    "hoek": "2.x.x",
-    "node-uuid": "1.4.x"
+    "hoek": "^2.14.0"
   },
   "devDependencies": {
-    "hapi": "8.x.x"
+    "hapi": "^8.8.0"
   },
   "peerDependencies": {
-    "hapi": "8.x.x"
+    "hapi": "^8.8.0"
   }
 }

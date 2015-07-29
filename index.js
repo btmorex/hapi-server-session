@@ -73,7 +73,7 @@ function register(server, options, next) {
             request._session = hoek.clone(request.session);
             reply.continue();
           }, function (err) {
-            reply(boom.serverTimeout(err.message));
+            reply(boom.wrap(err, 503));
           });
         return;
       } else {
@@ -104,7 +104,7 @@ function register(server, options, next) {
       .done(function () {
         reply.continue();
       }, function (err) {
-        reply(boom.serverTimeout(err.message));
+        reply(boom.wrap(err, 503));
       });
   });
 

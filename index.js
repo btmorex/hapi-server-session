@@ -1,5 +1,6 @@
 'use strict';
 
+const boom = require('boom');
 const crypto = require('crypto');
 const hoek = require('hoek');
 const node = require('when/node');
@@ -72,7 +73,7 @@ function register(server, options, next) {
             request._session = hoek.clone(request.session);
             reply.continue();
           }, function (err) {
-            reply(err);
+            reply(boom.serverTimeout(err.message));
           });
         return;
       } else {
@@ -94,7 +95,7 @@ function register(server, options, next) {
       try {
         sessionId = createSessionId();
       } catch (err) {
-        reply(err);
+        reply(boom.wrap(err, 500));
         return;
       }
       reply.state(options.name, sessionId);
@@ -103,7 +104,7 @@ function register(server, options, next) {
       .done(function () {
         reply.continue();
       }, function (err) {
-        reply(err);
+        reply(boom.serverTimeout(err.message));
       });
   });
 

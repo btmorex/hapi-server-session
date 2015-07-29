@@ -165,11 +165,11 @@ describe('plugin', function () {
     });
 
     describe('when cache is unavailable', function () {
-      it('should reply with internal server error', function (done) {
+      it('should reply with service unavailable', function (done) {
         cache.stop();
         server.inject('/write', function (response) {
           try {
-            expect(response.statusCode).to.equal(500);
+            expect(response.statusCode).to.equal(503);
             done();
           } catch (err) {
             done(err);
@@ -246,7 +246,7 @@ describe('plugin', function () {
     });
 
     describe('when cache is unavailable', function () {
-      it('should reply with internal server error', function (done) {
+      it('should reply with service unavailable', function (done) {
         server.inject('/write', function (initialResponse) {
           const setCookie = initialResponse.headers['set-cookie'][0];
           const options = {
@@ -258,7 +258,7 @@ describe('plugin', function () {
           cache.stop();
           server.inject(options, function (response) {
             try {
-              expect(response.statusCode).to.equal(500);
+              expect(response.statusCode).to.equal(503);
               done();
             } catch (err) {
               done(err);

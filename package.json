@@ -26,6 +26,7 @@
     "test-cov": "istanbul cover --dir test/coverage node_modules/.bin/_mocha"
   },
   "dependencies": {
+    "boom": "^2.8.0",
     "hoek": "^2.14.0",
     "when": "^3.7.3"
   },

@@ -34,6 +34,7 @@
     "catbox-memory": "^1.1.1",
     "chai": "^3.2.0",
     "hapi": "^8.8.0",
+    "inject-then": "^2.0.0",
     "istanbul": "^0.3.17",
     "mocha": "^2.2.5"
   },

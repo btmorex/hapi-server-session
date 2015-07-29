@@ -48,13 +48,17 @@ function register(server, options, next) {
   }
 
   function isValidSessionId(sessionId) {
+    let minSize = options.size;
+    if (options.expiresIn) {
+      minSize += 8;
+    }
     const decodedSessionId = hoek.base64urlDecode(sessionId, 'buffer');
+    if (decodedSessionId.length < minSize) {
+      return false;
+    }
     const randomBytes = decodedSessionId.slice(0, options.size);
     let expiresAt;
     if (options.expiresIn) {
-      if (decodedSessionId.length < options.size + 8) {
-        return false;
-      }
       expiresAt = decodedSessionId.readDoubleBE(options.size);
       if (Date.now() >= expiresAt) {
         return false;
@@ -67,7 +71,8 @@ function register(server, options, next) {
     const sessionId = request.state[options.name];
     if (sessionId) {
       if (isValidSessionId(sessionId)) {
-        node.call(cache.get.bind(cache), sessionId)
+        request._sessionId = sessionId;
+        node.call(cache.get.bind(cache), request._sessionId)
           .done(function (value) {
             request.session = value[0] !== null ? value[0] : {};
             request._session = hoek.clone(request.session);
@@ -90,7 +95,7 @@ function register(server, options, next) {
       reply.continue();
       return;
     }
-    let sessionId = request.state[options.name];
+    let sessionId = request._sessionId;
     if (!sessionId) {
       try {
         sessionId = createSessionId();

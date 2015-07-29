@@ -19,9 +19,10 @@ const defaultOptions = {
 };
 
 function register(server, options, next) {
-  options = hoek.applyToDefaults(defaultOptions, options);
-  if (options.expiresIn && typeof options.cache.expiresIn === 'undefined') {
-    options.cache.expiresIn = options.expiresIn;
+  options = hoek.applyToDefaults(defaultOptions, options, true);
+  if (!options.cache.expiresIn) {
+    const maxExpiresIn = Math.pow(2, 31) - 1;
+    options.cache.expiresIn = Math.min(options.expiresIn || maxExpiresIn, maxExpiresIn);
   }
 
   server.state(options.name, options.cookie);
@@ -50,6 +51,9 @@ function register(server, options, next) {
     const randomBytes = decodedSessionId.slice(0, options.size);
     let expiresAt;
     if (options.expiresIn) {
+      if (decodedSessionId.length < options.size + 8) {
+        return false;
+      }
       expiresAt = decodedSessionId.readDoubleBE(options.size);
       if (Date.now() >= expiresAt) {
         return false;
@@ -63,13 +67,12 @@ function register(server, options, next) {
     if (sessionId) {
       if (isValidSessionId(sessionId)) {
         node.call(cache.get.bind(cache), sessionId)
-          .catch(function (err) {
-            reply(err);
-          })
           .done(function (value) {
-            request.session = value != null ? value : {};
+            request.session = value[0] !== null ? value[0] : {};
             request._session = hoek.clone(request.session);
             reply.continue();
+          }, function (err) {
+            reply(err);
           });
         return;
       } else {
@@ -97,11 +100,10 @@ function register(server, options, next) {
       reply.state(options.name, sessionId);
     }
     node.call(cache.set.bind(cache), sessionId, request.session, 0)
-      .catch(function (err) {
-        reply(err);
-      })
       .done(function () {
         reply.continue();
+      }, function (err) {
+        reply(err);
       });
   });
 

@@ -14,15 +14,13 @@ const describe = mocha.describe;
 const expect = chai.expect;
 const it = mocha.it;
 
-const defaultConfig = {
-  connection: {
+function createServer(options) {
+  const server = new hapi.Server();
+  server.connection({
     host: 'localhost',
     address: '127.0.0.1',
-  },
-  register: {
-    register: require('../index.js'),
-  },
-  route: {
+  });
+  server.route({
     method: 'GET',
     path: '/',
     handler: function (request, reply) {
@@ -31,24 +29,22 @@ const defaultConfig = {
       }
       reply(request.session.test);
     },
-  },
-};
-
-function createServer(config) {
-  config = hoek.applyToDefaults(defaultConfig, config || {}, true);
-  const server = new hapi.Server();
-  server.connection(config.connection);
-  server.route(config.route);
-  const plugins = [{
-    register: require('inject-then'),
-    options: {
-      Promise: when.Promise,
+  });
+  const plugins = [
+    {
+      register: require('inject-then'),
+      options: {
+        Promise: when.Promise,
+      },
     },
-  }];
-  plugins.push(config.register);
+    {
+      register: require('../index.js'),
+      options: options,
+    }
+  ];
   return node.call(server.register.bind(server), plugins)
     .then(function () {
-      return node.call(server.start.bind(server));
+      node.call(server.start.bind(server));
     })
     .yield(server);
 }
@@ -102,51 +98,11 @@ function expectSuccessWithCookie(res, value) {
   expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{32,75}; Secure; HttpOnly/);
 }
 
-describe('when key is not set', function () {
-  describe('when cookie is set', function () {
-    describe('when cookie is valid', function () {
-      describe('when session is not modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer({register: {options: {expiresIn: null}}})
-            .then(injectWithCookie)
-            .then(function (res) { expectSuccessWithoutCookie(res, '1'); })
-            .done(done, done);
-        });
-      });
-      describe('when session is modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer({register: {options: {expiresIn: null}}})
-            .then(injectWithCookieAndvalue)
-            .then(function (res) { expectSuccessWithoutCookie(res, '2'); })
-            .done(done, done);
-        });
-      });
-    });
-    describe('when cookie is not valid', function () {
-      describe('when session is not modified', function () {
-        it('should create session and clear cookie', function (done) {
-          createServer({register: {options: {expiresIn: null}}})
-            .then(function (server) {
-              return inject(server, undefined, 'id=abcd'); // short
-            })
-            .then(function (res) {
-              expectSuccess(res);
-              const clear = 'id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly';
-              expect(res.headers['set-cookie']).to.exist;
-              expect(res.headers['set-cookie'][0]).to.equal(clear);
-            })
-            .done(done, done);
-        });
-      });
-    });
-  });
-});
-
 describe('when key is set', function () {
   describe('when cookie is not set', function () {
     describe('when session is not modified', function () {
       it('should create session and not set cookie', function (done) {
-        createServer({register: {options: {key: 'test'}}})
+        createServer({key: 'test'})
           .then(inject)
           .then(expectSuccessWithoutCookie)
           .done(done, done);
@@ -154,14 +110,14 @@ describe('when key is set', function () {
     });
     describe('when session is modified', function () {
       it('should create session and set cookie', function (done) {
-        createServer({register: {options: {key: 'test'}}})
+        createServer({key: 'test'})
           .then(injectWithValue)
           .then(function (res) { expectSuccessWithCookie(res, '1'); })
           .done(done, done);
       });
       describe('when creating id fails', function () {
         it('should reply with internal server error', function (done) {
-          createServer({register: {options: {algorithm: 'invalid', key: 'test'}}})
+          createServer({algorithm: 'invalid', key: 'test'})
             .then(injectWithValue)
             .then(expectFailure)
             .done(done, done);
@@ -169,7 +125,7 @@ describe('when key is set', function () {
       });
       describe('when cache is unavailable', function () {
         it('should reply with internal server error', function (done) {
-          createServer({register: {options: {key: 'test'}}})
+          createServer({key: 'test'})
             .then(function (server) {
               server._caches._default.client.stop();
               return server;
@@ -185,14 +141,14 @@ describe('when key is set', function () {
     describe('when cookie is valid', function () {
       describe('when session is not modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({register: {options: {key: 'test'}}})
+          createServer({key: 'test'})
             .then(injectWithCookie)
             .then(function (res) { expectSuccessWithoutCookie(res, '1'); })
             .done(done, done);
         });
         describe('when cache is expired', function () {
           it('should create session and not set cookie', function (done) {
-            createServer({register: {options: {key: 'test', cache: {expiresIn: 1}}}})
+            createServer({key: 'test', cache: {expiresIn: 1}})
               .then(function (server) {
                 return injectWithValue(server)
                   .then(function (res) {
@@ -205,7 +161,7 @@ describe('when key is set', function () {
         });
         describe('when cache is unavailable', function () {
           it('should reply with internal server error', function (done) {
-            createServer({register: {options: {key: 'test'}}})
+            createServer({key: 'test'})
               .then(function (server) {
                 return injectWithValue(server)
                   .then(function (res) {
@@ -220,7 +176,42 @@ describe('when key is set', function () {
       });
       describe('when session is modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({register: {options: {key: 'test'}}})
+          createServer({key: 'test'})
+            .then(injectWithCookieAndvalue)
+            .then(function (res) { expectSuccessWithoutCookie(res, '2'); })
+            .done(done, done);
+        });
+      });
+    });
+    describe('when cookie is not valid', function () {
+      describe('when session is modified', function () {
+        it('should create session and set cookie', function (done) {
+          createServer({key: 'test'})
+            .then(function (server) {
+              return inject(server, '1', 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI'); // expired
+            })
+            .then(function (res) { expectSuccessWithCookie(res, '1'); })
+            .done(done, done);
+        });
+      });
+    });
+  });
+});
+
+describe('when key is not set', function () {
+  describe('when cookie is set', function () {
+    describe('when cookie is valid', function () {
+      describe('when session is not modified', function () {
+        it('should load session and not set cookie', function (done) {
+          createServer({expiresIn: null})
+            .then(injectWithCookie)
+            .then(function (res) { expectSuccessWithoutCookie(res, '1'); })
+            .done(done, done);
+        });
+      });
+      describe('when session is modified', function () {
+        it('should load session and not set cookie', function (done) {
+          createServer({expiresIn: null})
             .then(injectWithCookieAndvalue)
             .then(function (res) { expectSuccessWithoutCookie(res, '2'); })
             .done(done, done);
@@ -230,7 +221,7 @@ describe('when key is set', function () {
     describe('when cookie is not valid', function () {
       describe('when session is not modified', function () {
         it('should create session and clear cookie', function (done) {
-          createServer({register: {options: {key: 'test'}}})
+          createServer({expiresIn: null})
             .then(function (server) {
               return inject(server, undefined, 'id=abcd'); // short
             })
@@ -240,16 +231,6 @@ describe('when key is set', function () {
               expect(res.headers['set-cookie']).to.exist;
               expect(res.headers['set-cookie'][0]).to.equal(clear);
             })
-            .done(done, done);
-        });
-      });
-      describe('when session is modified', function () {
-        it('should create session and set cookie', function (done) {
-          createServer({register: {options: {key: 'test'}}})
-            .then(function (server) {
-              return inject(server, '1', 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI'); // expired
-            })
-            .then(function (res) { expectSuccessWithCookie(res, '1'); })
             .done(done, done);
         });
       });

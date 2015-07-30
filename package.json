@@ -31,7 +31,6 @@
     "when": "^3.7.3"
   },
   "devDependencies": {
-    "catbox-memory": "^1.1.1",
     "chai": "^3.2.0",
     "hapi": "^8.8.0",
     "inject-then": "^2.0.0",

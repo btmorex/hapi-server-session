@@ -22,8 +22,8 @@
     "url": "https://github.com/btmorex/hapi-server-session.git"
   },
   "scripts": {
-    "test": "mocha",
-    "test-cov": "istanbul cover --dir test/coverage node_modules/.bin/_mocha"
+    "test": "istanbul cover --dir test/coverage _mocha",
+    "coveralls": "cat test/coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "boom": "^2.8.0",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "chai": "^3.2.0",
+    "coveralls": "^2.11.3",
     "hapi": "^8.8.0",
     "inject-then": "^2.0.0",
     "istanbul": "^0.3.17",

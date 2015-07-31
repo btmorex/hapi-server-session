@@ -80,7 +80,7 @@ describe('when key is set', function () {
           .then(inject)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({});
-            expect(res.statusCode).to.equal(300);
+            expect(res.statusCode).to.equal(200);
             expect(res.headers['set-cookie']).to.not.exist;
           })
           .done(done, done);

@@ -37,7 +37,7 @@ function createServer(options) {
       },
     },
     {
-      register: require('../index.js'),
+      register: require('..'),
       options: options,
     },
   ];

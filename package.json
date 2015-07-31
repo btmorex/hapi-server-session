@@ -16,7 +16,7 @@
     "email": "avery@shadypixel.com",
     "url": "https://averyfay.com/"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/btmorex/hapi-server-session.git"

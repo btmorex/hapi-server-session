@@ -26,9 +26,9 @@ server.connection({
 });
 
 server.register({
-  register: require('../index.js'),
+  register: require('hapi-server-session'),
   options: {
-    cookieOptions: {
+    cookie: {
       isSecure: false,
     },
   },

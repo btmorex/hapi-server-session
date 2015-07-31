@@ -57,5 +57,5 @@ server.start();
     - `isSecure`: [Default: `true`] sets the secure flag
 - `expiresIn`: session id expiration in milliseconds. Prevents intercepted cookies from working perpetually. Requires `key`
 - `name`: [Default: `'id'`] name of the cookie
-- `key`: signing key. Prevents weaknesses in randomness from affecting overall security. If absent, the cookie will not be signed
+- `key`: signing key. Prevents weaknesses in randomness from affecting overall security
 - `size`: [Default: `16`] number of random bytes in the session id

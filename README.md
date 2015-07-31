@@ -55,7 +55,7 @@ server.start();
 - `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
     - `isHttpOnly`: [Default: `true`] sets the HttpOnly flag
     - `isSecure`: [Default: `true`] sets the secure flag
-- `expiresIn`: adds an expiraton in milliseconds to cookie. Prevents intercepted cookies from working forever. Requires `key`
-- `name`: [Default: `'id'`] the name of the cookie
-- `key`: the signing key. If absent, the cookie will not be signed
-- `size`: [Default: `16`] the number of random bytes in session id
+- `expiresIn`: session id expiration in milliseconds. Prevents intercepted cookies from working perpetually. Requires `key`
+- `name`: [Default: `'id'`] name of the cookie
+- `key`: signing key. Prevents weaknesses in randomness from affecting overall security. If absent, the cookie will not be signed
+- `size`: [Default: `16`] number of random bytes in the session id

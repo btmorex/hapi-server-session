@@ -50,7 +50,7 @@ server.start();
 
 - `algorithm`: [Default: `'sha256'`] algorithm to use during signing
 - `cache`: supports the same options as [`server.cache(options)`](http://hapijs.com/api#servercacheoptions)
-    - `expiresIn`: [Default: outer `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
+    - `expiresIn`: [Default: session id `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
     - `segment`: [Default: `'session'`] session cache segment
 - `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
     - `isHttpOnly`: [Default: `true`] sets the HttpOnly flag

@@ -73,7 +73,7 @@ function injectWithCookieAndvalue(server) {
 
 describe('when key is set', function () {
   describe('and cookie is not set', function () {
-    describe('and session is not modified,', function () {
+    describe('and session is not modified', function () {
       this.slow(500); // first test is slow regardless
       it('should create session and not set cookie', function (done) {
         createServer({key: 'test'})

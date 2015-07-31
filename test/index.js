@@ -76,7 +76,7 @@ describe('when key is set', function () {
     describe('and session is not modified', function () {
       this.slow(500); // first test is slow regardless
       it('should create session and not set cookie', function (done) {
-        createServer({key: 'test'})
+        createServer({expiresIn: 1000, key: 'test'})
           .then(inject)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({});
@@ -88,7 +88,7 @@ describe('when key is set', function () {
     });
     describe('and session is modified', function () {
       it('should create session and set cookie', function (done) {
-        createServer({key: 'test'})
+        createServer({expiresIn: 1000, key: 'test'})
           .then(injectWithValue)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({test: '1'});
@@ -100,7 +100,7 @@ describe('when key is set', function () {
       });
       describe('and creating id fails', function () {
         it('should reply with internal server error', function (done) {
-          createServer({algorithm: 'invalid', key: 'test'})
+          createServer({algorithm: 'invalid', expiresIn: 1000, key: 'test'})
             .then(injectWithValue)
             .then(function (res) { expect(res.statusCode).to.equal(500); })
             .done(done, done);
@@ -108,7 +108,7 @@ describe('when key is set', function () {
       });
       describe('and cache is unavailable', function () {
         it('should reply with internal server error', function (done) {
-          createServer({key: 'test'})
+          createServer({expiresIn: 1000, key: 'test'})
             .then(function (server) {
               server._caches._default.client.stop();
               return server;
@@ -124,7 +124,7 @@ describe('when key is set', function () {
     describe('and cookie is valid', function () {
       describe('and session is not modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({key: 'test'})
+          createServer({expiresIn: 1000, key: 'test'})
             .then(injectWithCookie)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '1'});
@@ -135,7 +135,7 @@ describe('when key is set', function () {
         });
         describe('and cache is expired', function () {
           it('should create session and not set cookie', function (done) {
-            createServer({key: 'test', cache: {expiresIn: 1}})
+            createServer({cache: {expiresIn: 1}, expiresIn: 1000, key: 'test'})
               .then(injectWithCookie)
               .then(function (res) {
                 expect(res.request.session).to.deep.equal({});
@@ -147,7 +147,7 @@ describe('when key is set', function () {
         });
         describe('and cache is unavailable', function () {
           it('should reply with internal server error', function (done) {
-            createServer({key: 'test'})
+            createServer({expiresIn: 1000, key: 'test'})
               .then(function (server) {
                 return injectWithValue(server)
                   .then(function (res) {
@@ -162,7 +162,7 @@ describe('when key is set', function () {
       });
       describe('and session is modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({key: 'test'})
+          createServer({expiresIn: 1000, key: 'test'})
             .then(injectWithCookieAndvalue)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '2'});
@@ -176,7 +176,7 @@ describe('when key is set', function () {
     describe('and cookie is not valid', function () {
       describe('and session is modified', function () {
         it('should create session and set cookie', function (done) {
-          createServer({key: 'test'})
+          createServer({expiresIn: 1000, key: 'test'})
             .then(function (server) {
               const options = {
                 cookie: 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI',
@@ -202,7 +202,7 @@ describe('when key is not set', function () {
     describe('and cookie is valid', function () {
       describe('and session is not modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({expiresIn: null})
+          createServer()
             .then(injectWithCookie)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '1'});
@@ -214,7 +214,7 @@ describe('when key is not set', function () {
       });
       describe('and session is modified', function () {
         it('should load session and not set cookie', function (done) {
-          createServer({expiresIn: null})
+          createServer()
             .then(injectWithCookieAndvalue)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '2'});
@@ -228,7 +228,7 @@ describe('when key is not set', function () {
     describe('and cookie is not valid', function () {
       describe('and session is not modified', function () {
         it('should create session and clear cookie', function (done) {
-          createServer({expiresIn: null})
+          createServer()
             .then(function (server) { return inject(server, {cookie: 'id=abcd'}); }) // short
             .then(function (res) {
               expect(res.request.session).to.deep.equal({});

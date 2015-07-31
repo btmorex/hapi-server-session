@@ -6,38 +6,42 @@ Simple server-side session support for hapi
 
 ## Install
 
-    $ npm install hapi-server-session
+```shell
+$ npm install hapi-server-session
+```
 
 ## Usage
 
-    'use strict';
+```javascript
+'use strict';
 
-    const hapi = require('hapi');
+const hapi = require('hapi');
 
-    const server = new hapi.Server();
+const server = new hapi.Server();
 
-    server.connection({
-      host: 'localhost',
-      address: '127.0.0.1',
-      port: 8000,
-    });
+server.connection({
+  host: 'localhost',
+  address: '127.0.0.1',
+  port: 8000,
+});
 
-    server.register({
-      register: require('../index.js'),
-      options: {
-        cookieOptions: {
-          isSecure: false,
-        },
-      },
-    }, function (err) { if (err) { throw err; } });
+server.register({
+  register: require('../index.js'),
+  options: {
+    cookieOptions: {
+      isSecure: false,
+    },
+  },
+}, function (err) { if (err) { throw err; } });
 
-    server.route({
-      method: 'GET',
-      path: '/',
-      handler: function (request, reply) {
-        request.session.views = request.session.views + 1 || 1;
-        reply('Views: ' + request.session.views);
-      },
-    });
+server.route({
+  method: 'GET',
+  path: '/',
+  handler: function (request, reply) {
+    request.session.views = request.session.views + 1 || 1;
+    reply('Views: ' + request.session.views);
+  },
+});
 
-    server.start();
+server.start();
+```

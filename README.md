@@ -10,7 +10,7 @@ Simple server-side session support for hapi
 $ npm install hapi-server-session
 ```
 
-## Usage
+## Example
 
 ```javascript
 'use strict';

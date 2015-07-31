@@ -72,20 +72,21 @@ function injectWithCookieAndvalue(server) {
 }
 
 describe('when key is set', function () {
-  describe('when cookie is not set', function () {
-    describe('when session is not modified', function () {
+  describe('and cookie is not set', function () {
+    describe('and session is not modified,', function () {
+      this.slow(500); // first test is slow regardless
       it('should create session and not set cookie', function (done) {
         createServer({key: 'test'})
           .then(inject)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({});
-            expect(res.statusCode).to.equal(200);
+            expect(res.statusCode).to.equal(300);
             expect(res.headers['set-cookie']).to.not.exist;
           })
           .done(done, done);
       });
     });
-    describe('when session is modified', function () {
+    describe('and session is modified', function () {
       it('should create session and set cookie', function (done) {
         createServer({key: 'test'})
           .then(injectWithValue)
@@ -97,7 +98,7 @@ describe('when key is set', function () {
           })
           .done(done, done);
       });
-      describe('when creating id fails', function () {
+      describe('and creating id fails', function () {
         it('should reply with internal server error', function (done) {
           createServer({algorithm: 'invalid', key: 'test'})
             .then(injectWithValue)
@@ -105,7 +106,7 @@ describe('when key is set', function () {
             .done(done, done);
         });
       });
-      describe('when cache is unavailable', function () {
+      describe('and cache is unavailable', function () {
         it('should reply with internal server error', function (done) {
           createServer({key: 'test'})
             .then(function (server) {
@@ -119,9 +120,9 @@ describe('when key is set', function () {
       });
     });
   });
-  describe('when cookie is set', function () {
-    describe('when cookie is valid', function () {
-      describe('when session is not modified', function () {
+  describe('and cookie is set', function () {
+    describe('and cookie is valid', function () {
+      describe('and session is not modified', function () {
         it('should load session and not set cookie', function (done) {
           createServer({key: 'test'})
             .then(injectWithCookie)
@@ -132,7 +133,7 @@ describe('when key is set', function () {
             })
             .done(done, done);
         });
-        describe('when cache is expired', function () {
+        describe('and cache is expired', function () {
           it('should create session and not set cookie', function (done) {
             createServer({key: 'test', cache: {expiresIn: 1}})
               .then(injectWithCookie)
@@ -144,7 +145,7 @@ describe('when key is set', function () {
               .done(done, done);
           });
         });
-        describe('when cache is unavailable', function () {
+        describe('and cache is unavailable', function () {
           it('should reply with internal server error', function (done) {
             createServer({key: 'test'})
               .then(function (server) {
@@ -159,7 +160,7 @@ describe('when key is set', function () {
           });
         });
       });
-      describe('when session is modified', function () {
+      describe('and session is modified', function () {
         it('should load session and not set cookie', function (done) {
           createServer({key: 'test'})
             .then(injectWithCookieAndvalue)
@@ -172,8 +173,8 @@ describe('when key is set', function () {
         });
       });
     });
-    describe('when cookie is not valid', function () {
-      describe('when session is modified', function () {
+    describe('and cookie is not valid', function () {
+      describe('and session is modified', function () {
         it('should create session and set cookie', function (done) {
           createServer({key: 'test'})
             .then(function (server) {
@@ -197,9 +198,9 @@ describe('when key is set', function () {
 });
 
 describe('when key is not set', function () {
-  describe('when cookie is set', function () {
-    describe('when cookie is valid', function () {
-      describe('when session is not modified', function () {
+  describe('and cookie is set', function () {
+    describe('and cookie is valid', function () {
+      describe('and session is not modified', function () {
         it('should load session and not set cookie', function (done) {
           createServer({expiresIn: null})
             .then(injectWithCookie)
@@ -211,7 +212,7 @@ describe('when key is not set', function () {
             .done(done, done);
         });
       });
-      describe('when session is modified', function () {
+      describe('and session is modified', function () {
         it('should load session and not set cookie', function (done) {
           createServer({expiresIn: null})
             .then(injectWithCookieAndvalue)
@@ -224,8 +225,8 @@ describe('when key is not set', function () {
         });
       });
     });
-    describe('when cookie is not valid', function () {
-      describe('when session is not modified', function () {
+    describe('and cookie is not valid', function () {
+      describe('and session is not modified', function () {
         it('should create session and clear cookie', function (done) {
           createServer({expiresIn: null})
             .then(function (server) { return inject(server, {cookie: 'id=abcd'}); }) // short

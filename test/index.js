@@ -6,7 +6,6 @@ const chai = require('chai');
 const hapi = require('hapi');
 const mocha = require('mocha');
 const node = require('when/node');
-const util = require('util');
 const when = require('when');
 
 const describe = mocha.describe;
@@ -42,9 +41,7 @@ function createServer(options) {
     },
   ];
   return node.call(server.register.bind(server), plugins)
-    .then(function () {
-      node.call(server.start.bind(server));
-    })
+    .then(function () { return node.call(server.start.bind(server)); })
     .yield(server);
 }
 
@@ -53,48 +50,25 @@ function extractCookie(res) {
   return cookie.slice(0, cookie.indexOf(';'));
 }
 
-function inject(server, value, cookie) {
-  const url = value ? '/?test=' + value : '/';
-  const options = {url: url};
-  if (!util.isNullOrUndefined(cookie)) {
-    options.headers = {cookie: cookie};
-  }
-  return server.injectThen(options);
+function inject(server, options) {
+  options = options || {};
+  const url = options.value ? '/?test=' + options.value : '/';
+  const headers = options.cookie ? {cookie: options.cookie} : {};
+  return server.injectThen({url: url, headers: headers});
 }
 
-function injectWithValue(server, value) {
-  return inject(server, value || '1');
+function injectWithValue(server) {
+  return inject(server, {value: '1'});
 }
 
-function injectWithCookie(server, value) {
+function injectWithCookie(server) {
   return injectWithValue(server)
-    .then(function (res) {
-      return inject(server, value, extractCookie(res));
-    });
+    .then(function (res) { return inject(server, {cookie: extractCookie(res)}); });
 }
 
 function injectWithCookieAndvalue(server) {
-  return injectWithCookie(server, '2');
-}
-
-function expectFailure(res) {
-  expect(res.statusCode).to.equal(500);
-}
-
-function expectSuccess(res, value) {
-  expect(res.request.session).to.deep.equal(value ? {test: value} : {});
-  expect(res.statusCode).to.equal(200);
-}
-
-function expectSuccessWithoutCookie(res, value) {
-  expectSuccess(res, value);
-  expect(res.headers['set-cookie']).to.not.exist;
-}
-
-function expectSuccessWithCookie(res, value) {
-  expectSuccess(res, value);
-  expect(res.headers['set-cookie']).to.exist;
-  expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{32,75}; Secure; HttpOnly/);
+  return injectWithValue(server)
+    .then(function (res) { return inject(server, {cookie: extractCookie(res), value: '2'}); });
 }
 
 describe('when key is set', function () {
@@ -103,7 +77,11 @@ describe('when key is set', function () {
       it('should create session and not set cookie', function (done) {
         createServer({key: 'test'})
           .then(inject)
-          .then(expectSuccessWithoutCookie)
+          .then(function (res) {
+            expect(res.request.session).to.deep.equal({});
+            expect(res.statusCode).to.equal(200);
+            expect(res.headers['set-cookie']).to.not.exist;
+          })
           .done(done, done);
       });
     });
@@ -111,14 +89,19 @@ describe('when key is set', function () {
       it('should create session and set cookie', function (done) {
         createServer({key: 'test'})
           .then(injectWithValue)
-          .then(function (res) { expectSuccessWithCookie(res, '1'); })
+          .then(function (res) {
+            expect(res.request.session).to.deep.equal({test: '1'});
+            expect(res.statusCode).to.equal(200);
+            expect(res.headers['set-cookie']).to.exist;
+            expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{75}; Secure; HttpOnly/);
+          })
           .done(done, done);
       });
       describe('when creating id fails', function () {
         it('should reply with internal server error', function (done) {
           createServer({algorithm: 'invalid', key: 'test'})
             .then(injectWithValue)
-            .then(expectFailure)
+            .then(function (res) { expect(res.statusCode).to.equal(500); })
             .done(done, done);
         });
       });
@@ -130,7 +113,7 @@ describe('when key is set', function () {
               return server;
             })
             .then(injectWithValue)
-            .then(expectFailure)
+            .then(function (res) { expect(res.statusCode).to.equal(500); })
             .done(done, done);
         });
       });
@@ -142,19 +125,22 @@ describe('when key is set', function () {
         it('should load session and not set cookie', function (done) {
           createServer({key: 'test'})
             .then(injectWithCookie)
-            .then(function (res) { expectSuccessWithoutCookie(res, '1'); })
+            .then(function (res) {
+              expect(res.request.session).to.deep.equal({test: '1'});
+              expect(res.statusCode).to.equal(200);
+              expect(res.headers['set-cookie']).to.not.exist;
+            })
             .done(done, done);
         });
         describe('when cache is expired', function () {
           it('should create session and not set cookie', function (done) {
             createServer({key: 'test', cache: {expiresIn: 1}})
-              .then(function (server) {
-                return injectWithValue(server)
-                  .then(function (res) {
-                    return inject(server, undefined, extractCookie(res));
-                  });
+              .then(injectWithCookie)
+              .then(function (res) {
+                expect(res.request.session).to.deep.equal({});
+                expect(res.statusCode).to.equal(200);
+                expect(res.headers['set-cookie']).to.not.exist;
               })
-              .then(expectSuccessWithoutCookie)
               .done(done, done);
           });
         });
@@ -165,10 +151,10 @@ describe('when key is set', function () {
                 return injectWithValue(server)
                   .then(function (res) {
                     server._caches._default.client.stop();
-                    return inject(server, undefined, extractCookie(res));
+                    return inject(server, {cookie: extractCookie(res)});
                   });
               })
-              .then(expectFailure)
+              .then(function (res) { expect(res.statusCode).to.equal(500); })
               .done(done, done);
           });
         });
@@ -177,7 +163,11 @@ describe('when key is set', function () {
         it('should load session and not set cookie', function (done) {
           createServer({key: 'test'})
             .then(injectWithCookieAndvalue)
-            .then(function (res) { expectSuccessWithoutCookie(res, '2'); })
+            .then(function (res) {
+              expect(res.request.session).to.deep.equal({test: '2'});
+              expect(res.statusCode).to.equal(200);
+              expect(res.headers['set-cookie']).to.not.exist;
+            })
             .done(done, done);
         });
       });
@@ -187,9 +177,18 @@ describe('when key is set', function () {
         it('should create session and set cookie', function (done) {
           createServer({key: 'test'})
             .then(function (server) {
-              return inject(server, '1', 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI'); // expired
+              const options = {
+                cookie: 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI',
+                value: '1',
+              };
+              return inject(server, options); // expired
             })
-            .then(function (res) { expectSuccessWithCookie(res, '1'); })
+            .then(function (res) {
+              expect(res.request.session).to.deep.equal({test: '1'});
+              expect(res.statusCode).to.equal(200);
+              expect(res.headers['set-cookie']).to.exist;
+              expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{75}; Secure; HttpOnly/);
+            })
             .done(done, done);
         });
       });
@@ -204,7 +203,11 @@ describe('when key is not set', function () {
         it('should load session and not set cookie', function (done) {
           createServer({expiresIn: null})
             .then(injectWithCookie)
-            .then(function (res) { expectSuccessWithoutCookie(res, '1'); })
+            .then(function (res) {
+              expect(res.request.session).to.deep.equal({test: '1'});
+              expect(res.statusCode).to.equal(200);
+              expect(res.headers['set-cookie']).to.not.exist;
+            })
             .done(done, done);
         });
       });
@@ -212,7 +215,11 @@ describe('when key is not set', function () {
         it('should load session and not set cookie', function (done) {
           createServer({expiresIn: null})
             .then(injectWithCookieAndvalue)
-            .then(function (res) { expectSuccessWithoutCookie(res, '2'); })
+            .then(function (res) {
+              expect(res.request.session).to.deep.equal({test: '2'});
+              expect(res.statusCode).to.equal(200);
+              expect(res.headers['set-cookie']).to.not.exist;
+            })
             .done(done, done);
         });
       });
@@ -221,11 +228,10 @@ describe('when key is not set', function () {
       describe('when session is not modified', function () {
         it('should create session and clear cookie', function (done) {
           createServer({expiresIn: null})
-            .then(function (server) {
-              return inject(server, undefined, 'id=abcd'); // short
-            })
+            .then(function (server) { return inject(server, {cookie: 'id=abcd'}); }) // short
             .then(function (res) {
-              expectSuccess(res);
+              expect(res.request.session).to.deep.equal({});
+              expect(res.statusCode).to.equal(200);
               const clear = 'id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly';
               expect(res.headers['set-cookie']).to.exist;
               expect(res.headers['set-cookie'][0]).to.equal(clear);

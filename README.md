@@ -45,3 +45,17 @@ server.route({
 
 server.start();
 ```
+
+## Options
+
+- `algorithm`: [Default: `'sha256'`] algorithm to use during signing
+- `cache`: supports the same options as [`server.cache(options)`](http://hapijs.com/api#servercacheoptions)
+    - `expiresIn`: [Default: outer `expiresIn`] session cache expiration in milliseconds
+    - `segment`: [Default: `'session'`] session cache segment
+- `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
+    - `isHttpOnly`: [Default: `true`] sets the HttpOnly flag
+    - `isSecure`: [Default: `true`] sets the secure flag
+- `expiresIn`: adds an expiraton in milliseconds to cookie. Prevents intercepted cookies from working forever. Requires `key`
+- `name`: [Default: `'id'`] the name of the cookie
+- `key`: the signing key. If absent, the cookie will not be signed
+- `size`: [Default: `16`] the number of random bytes in session id

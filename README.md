@@ -54,7 +54,7 @@ server.start();
     - `segment`: [Default: `'session'`] session cache segment
 - `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
     - `isHttpOnly`: [Default: `true`] sets the HttpOnly flag
-    - `isSecure`: [Default: `true`] sets the secure flag
+    - `isSecure`: [Default: `true`] sets the secure flag. Should never be set to `false` in production
 - `expiresIn`: session id expiration in milliseconds. Prevents intercepted cookies from working perpetually. Requires `key`
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security

@@ -4,7 +4,6 @@
 
 const chai = require('chai');
 const hapi = require('hapi');
-const hoek = require('hoek');
 const mocha = require('mocha');
 const node = require('when/node');
 const util = require('util');
@@ -40,7 +39,7 @@ function createServer(options) {
     {
       register: require('../index.js'),
       options: options,
-    }
+    },
   ];
   return node.call(server.register.bind(server), plugins)
     .then(function () {
@@ -50,7 +49,7 @@ function createServer(options) {
 }
 
 function extractCookie(res) {
-  let cookie = res.headers['set-cookie'][0];
+  const cookie = res.headers['set-cookie'][0];
   return cookie.slice(0, cookie.indexOf(';'));
 }
 
@@ -153,7 +152,7 @@ describe('when key is set', function () {
                 return injectWithValue(server)
                   .then(function (res) {
                     return inject(server, undefined, extractCookie(res));
-                  })
+                  });
               })
               .then(expectSuccessWithoutCookie)
               .done(done, done);
@@ -167,7 +166,7 @@ describe('when key is set', function () {
                   .then(function (res) {
                     server._caches._default.client.stop();
                     return inject(server, undefined, extractCookie(res));
-                  })
+                  });
               })
               .then(expectFailure)
               .done(done, done);

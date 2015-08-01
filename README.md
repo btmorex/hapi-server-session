@@ -6,9 +6,9 @@ Simple server-side session support for hapi
 
 ## Install
 
-```shell
-$ npm install hapi-server-session
-```
+
+    $ npm install hapi-server-session
+
 
 ## Example
 

@@ -53,7 +53,7 @@ server.start();
     - `expiresIn`: [Default: session id `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
     - `segment`: [Default: `'session'`] session cache segment
 - `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
-    - `isSameSite`: [Default: `'Lax'`] sets the SameSite flag
+    - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
 - `expiresIn`: session id expiration in milliseconds. Prevents intercepted cookies from working perpetually. Requires `key`
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security
@@ -63,4 +63,4 @@ server.start();
 
 ### [v3.0.0]
 
-- default cookie's SameSite flag to Lax. Could break sites that require the session to be available during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>
+- default cookie's `SameSite` flag to `Lax`. Could break sites that require session during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>

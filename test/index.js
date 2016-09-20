@@ -213,9 +213,8 @@ describe('when key is not set', function () {
               return when.map(responses, function (res) {
                 expect(res.request.session).to.deep.equal({});
                 expect(res.statusCode).to.equal(200);
-                const clear = 'id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly';
                 expect(res.headers['set-cookie']).to.exist;
-                expect(res.headers['set-cookie'][0]).to.equal(clear);
+                expect(res.headers['set-cookie'][0]).to.equal('id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Lax');
               });
             });
         });

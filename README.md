@@ -61,6 +61,6 @@ server.start();
 
 ## Changes
 
-### [v3.0.0]
+### [v3.0.0](https://github.com/btmorex/hapi-server-session/compare/v2.0.5...v3.0.0)
 
-- default cookie's `SameSite` flag to `Lax`. Could break sites that require session during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>
+- default `SameSite` flag to `Lax`. Could break sites that require session during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>

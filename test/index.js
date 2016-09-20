@@ -5,7 +5,6 @@
 const chai = require('chai');
 const hapi = require('hapi');
 const mocha = require('mocha');
-const node = require('when/node');
 const when = require('when');
 
 const describe = mocha.describe;
@@ -40,8 +39,8 @@ function createServer(options) {
       options: options,
     },
   ];
-  return node.call(server.register.bind(server), plugins)
-    .then(function () { return node.call(server.start.bind(server)); })
+  return when(server.register(plugins))
+    .then(function () { return server.start(); })
     .yield(server);
 }
 

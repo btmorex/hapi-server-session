@@ -27,19 +27,7 @@ function createServer(options) {
       reply(request.session.test);
     },
   });
-  const plugins = [
-    {
-      register: require('inject-then'),
-      options: {
-        Promise: when.Promise,
-      },
-    },
-    {
-      register: require('..'),
-      options: options,
-    },
-  ];
-  return when(server.register(plugins))
+  return when(server.register({register: require('..'), options: options}))
     .then(function () { return server.start(); })
     .yield(server);
 }
@@ -53,7 +41,7 @@ function inject(server, options) {
   options = options || {};
   const url = options.value ? '/?test=' + options.value : '/';
   const headers = options.cookie ? {cookie: options.cookie} : {};
-  return server.injectThen({url: url, headers: headers});
+  return server.inject({url: url, headers: headers});
 }
 
 function injectWithValue(server) {

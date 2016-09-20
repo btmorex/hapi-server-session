@@ -62,47 +62,43 @@ describe('when key is set', function () {
   describe('and cookie is not set', function () {
     describe('and session is not modified', function () {
       this.slow(500); // first test is slow regardless
-      it('should create session and not set cookie', function (done) {
-        createServer({expiresIn: 1000, key: 'test'})
+      it('should create session and not set cookie', function () {
+        return createServer({expiresIn: 1000, key: 'test'})
           .then(inject)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({});
             expect(res.statusCode).to.equal(200);
             expect(res.headers['set-cookie']).to.not.exist;
-          })
-          .done(done, done);
+          });
       });
     });
     describe('and session is modified', function () {
-      it('should create session and set cookie', function (done) {
-        createServer({expiresIn: 1000, key: 'test'})
+      it('should create session and set cookie', function () {
+        return createServer({expiresIn: 1000, key: 'test'})
           .then(injectWithValue)
           .then(function (res) {
             expect(res.request.session).to.deep.equal({test: '1'});
             expect(res.statusCode).to.equal(200);
             expect(res.headers['set-cookie']).to.exist;
             expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{75}; Secure; HttpOnly/);
-          })
-          .done(done, done);
+          });
       });
       describe('and creating id fails', function () {
-        it('should reply with internal server error', function (done) {
-          createServer({algorithm: 'invalid', expiresIn: 1000, key: 'test'})
+        it('should reply with internal server error', function () {
+          return createServer({algorithm: 'invalid', expiresIn: 1000, key: 'test'})
             .then(injectWithValue)
-            .then(function (res) { expect(res.statusCode).to.equal(500); })
-            .done(done, done);
+            .then(function (res) { expect(res.statusCode).to.equal(500); });
         });
       });
       describe('and cache is unavailable', function () {
-        it('should reply with internal server error', function (done) {
-          createServer({expiresIn: 1000, key: 'test'})
+        it('should reply with internal server error', function () {
+          return createServer({expiresIn: 1000, key: 'test'})
             .then(function (server) {
               server._caches._default.client.stop();
               return server;
             })
             .then(injectWithValue)
-            .then(function (res) { expect(res.statusCode).to.equal(500); })
-            .done(done, done);
+            .then(function (res) { expect(res.statusCode).to.equal(500); });
         });
       });
     });
@@ -110,31 +106,29 @@ describe('when key is set', function () {
   describe('and cookie is set', function () {
     describe('and cookie is valid', function () {
       describe('and session is not modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer({expiresIn: 1000, key: 'test'})
+        it('should load session and not set cookie', function () {
+          return createServer({expiresIn: 1000, key: 'test'})
             .then(injectWithCookie)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '1'});
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.not.exist;
-            })
-            .done(done, done);
+            });
         });
         describe('and cache is expired', function () {
-          it('should create session and not set cookie', function (done) {
-            createServer({cache: {expiresIn: 1}, expiresIn: 1000, key: 'test'})
+          it('should create session and not set cookie', function () {
+            return createServer({cache: {expiresIn: 1}, expiresIn: 1000, key: 'test'})
               .then(injectWithCookie)
               .then(function (res) {
                 expect(res.request.session).to.deep.equal({});
                 expect(res.statusCode).to.equal(200);
                 expect(res.headers['set-cookie']).to.not.exist;
-              })
-              .done(done, done);
+              });
           });
         });
         describe('and cache is unavailable', function () {
-          it('should reply with internal server error', function (done) {
-            createServer({expiresIn: 1000, key: 'test'})
+          it('should reply with internal server error', function () {
+            return createServer({expiresIn: 1000, key: 'test'})
               .then(function (server) {
                 return injectWithValue(server)
                   .then(function (res) {
@@ -142,28 +136,26 @@ describe('when key is set', function () {
                     return inject(server, {cookie: extractCookie(res)});
                   });
               })
-              .then(function (res) { expect(res.statusCode).to.equal(500); })
-              .done(done, done);
+              .then(function (res) { expect(res.statusCode).to.equal(500); });
           });
         });
       });
       describe('and session is modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer({expiresIn: 1000, key: 'test'})
+        it('should load session and not set cookie', function () {
+          return createServer({expiresIn: 1000, key: 'test'})
             .then(injectWithCookieAndvalue)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '2'});
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.not.exist;
-            })
-            .done(done, done);
+            });
         });
       });
     });
     describe('and cookie is not valid', function () {
       describe('and session is modified', function () {
-        it('should create session and set cookie', function (done) {
-          createServer({expiresIn: 1000, key: 'test'})
+        it('should create session and set cookie', function () {
+          return createServer({expiresIn: 1000, key: 'test'})
             .then(function (server) {
               const options = {
                 cookie: 'id=KRf_gZUqEMW66rRSIbZdIEJ07XGZxBAAfqnbNGAtyDDVmMSHbzKoFA7oAkCsvxgfC2xSVJPMvjI',
@@ -176,8 +168,7 @@ describe('when key is set', function () {
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.exist;
               expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{75}; Secure; HttpOnly/);
-            })
-            .done(done, done);
+            });
         });
       });
     });
@@ -188,27 +179,25 @@ describe('when key is not set', function () {
   describe('and cookie is set', function () {
     describe('and cookie is valid', function () {
       describe('and session is not modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer()
+        it('should load session and not set cookie', function () {
+          return createServer()
             .then(injectWithCookie)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '1'});
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.not.exist;
-            })
-            .done(done, done);
+            });
         });
       });
       describe('and session is modified', function () {
-        it('should load session and not set cookie', function (done) {
-          createServer()
+        it('should load session and not set cookie', function () {
+          return createServer()
             .then(injectWithCookieAndvalue)
             .then(function (res) {
               expect(res.request.session).to.deep.equal({test: '2'});
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.not.exist;
-            })
-            .done(done, done);
+            });
         });
       });
     });
@@ -228,7 +217,7 @@ describe('when key is not set', function () {
                 expect(res.headers['set-cookie']).to.exist;
                 expect(res.headers['set-cookie'][0]).to.equal(clear);
               });
-            })
+            });
         });
       });
     });

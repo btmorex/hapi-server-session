@@ -2,7 +2,7 @@
 
 Simple server-side session support for hapi
 
-[![Build Status](https://travis-ci.org/btmorex/hapi-server-session.svg?branch=master)](https://travis-ci.org/btmorex/hapi-server-session) [![Coverage Status](https://coveralls.io/repos/btmorex/hapi-server-session/badge.svg?branch=master&service=github)](https://coveralls.io/github/btmorex/hapi-server-session?branch=master) ![Dependencies Status](https://david-dm.org/btmorex/hapi-server-session.svg)
+[![Build Status](https://travis-ci.org/btmorex/hapi-server-session.svg?branch=master)](https://travis-ci.org/btmorex/hapi-server-session) [![Coverage Status](https://coveralls.io/repos/btmorex/hapi-server-session/badge.svg?branch=master&service=github)](https://coveralls.io/github/btmorex/hapi-server-session?branch=master) [![Dependency Status](https://www.versioneye.com/user/projects/57e385216dfcd0003649c8f5/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57e385216dfcd0003649c8f5)
 
 ## Install
 

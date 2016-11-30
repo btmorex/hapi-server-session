@@ -33,11 +33,11 @@
   "devDependencies": {
     "chai": "^3.2",
     "coveralls": "^2.11.3",
-    "hapi": "^15",
+    "hapi": "^16",
     "istanbul": "^0.4",
     "mocha": "^3"
   },
   "peerDependencies": {
-    "hapi": "^15"
+    "hapi": ">=15 <17"
   }
 }

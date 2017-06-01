@@ -31,7 +31,7 @@
     "when": "^3.7.3"
   },
   "devDependencies": {
-    "chai": "^3.2",
+    "chai": ">=3.2 <5",
     "coveralls": "^2.11.3",
     "hapi": "^16",
     "istanbul": "^0.4",

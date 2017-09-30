@@ -26,13 +26,13 @@
     "coveralls": "cat test/coverage/lcov.info | coveralls"
   },
   "dependencies": {
-    "boom": ">=2.8 <6",
-    "hoek": ">=2.14 <5",
+    "boom": ">=2.8 <7",
+    "hoek": ">=2.14 <6",
     "when": "^3.7.3"
   },
   "devDependencies": {
-    "chai": ">=3.2 <5",
-    "coveralls": "^2.11.3",
+    "chai": "^4",
+    "coveralls": "^3",
     "hapi": "^16",
     "istanbul": "^0.4",
     "mocha": "^3"

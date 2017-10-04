@@ -22,7 +22,7 @@
     "url": "https://github.com/btmorex/hapi-server-session.git"
   },
   "scripts": {
-    "test": "istanbul cover --dir test/coverage _mocha",
+    "test": "istanbul cover --dir test/coverage _mocha -- --exit",
     "coveralls": "cat test/coverage/lcov.info | coveralls"
   },
   "dependencies": {
@@ -35,7 +35,7 @@
     "coveralls": "^3",
     "hapi": "^16",
     "istanbul": "^0.4",
-    "mocha": "^3"
+    "mocha": "^4"
   },
   "peerDependencies": {
     "hapi": ">=15 <17"

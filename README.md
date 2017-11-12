@@ -17,33 +17,35 @@ Simple server-side session support for hapi
 
 const hapi = require('hapi');
 
-const server = new hapi.Server();
+const main = async () => {
+  const server = new hapi.Server({
+    host: 'localhost',
+    address: '127.0.0.1',
+    port: 8000,
+  });
 
-server.connection({
-  host: 'localhost',
-  address: '127.0.0.1',
-  port: 8000,
-});
-
-server.register({
-  register: require('hapi-server-session'),
-  options: {
-    cookie: {
-      isSecure: false,
+  await server.register({
+    plugin: require('..'),
+    options: {
+      cookie: {
+        isSecure: false,
+      },
     },
-  },
-}, function (err) { if (err) { throw err; } });
+  });
 
-server.route({
-  method: 'GET',
-  path: '/',
-  handler: function (request, reply) {
-    request.session.views = request.session.views + 1 || 1;
-    reply('Views: ' + request.session.views);
-  },
-});
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+      request.session.views = request.session.views + 1 || 1;
+      return 'Views: ' + request.session.views;
+    },
+  });
 
-server.start();
+  await server.start();
+};
+
+main().catch(console.error);
 ```
 
 ## Options
@@ -60,6 +62,10 @@ server.start();
 - `size`: [Default: `16`] number of random bytes in the session id
 
 ## Changes
+
+### [v4.0.0](https://github.com/btmorex/hapi-server-session/compare/v3.0.2...v4.0.0)
+
+- support hapi v17
 
 ### [v3.0.0](https://github.com/btmorex/hapi-server-session/compare/v2.0.5...v3.0.0)
 

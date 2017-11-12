@@ -1,6 +1,6 @@
 {
   "name": "hapi-server-session",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "Simple server-side session support for hapi",
   "keywords": [
     "hapi",
@@ -22,22 +22,20 @@
     "url": "https://github.com/btmorex/hapi-server-session.git"
   },
   "scripts": {
-    "test": "istanbul cover --dir test/coverage _mocha -- --exit",
-    "coveralls": "cat test/coverage/lcov.info | coveralls"
+    "test": "nyc mocha",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "boom": ">=2.8 <7",
-    "hoek": ">=2.14 <6",
-    "when": "^3.7.3"
+    "hoek": ">=2 <6"
   },
   "devDependencies": {
     "chai": "^4",
     "coveralls": "^3",
-    "hapi": "^16",
-    "istanbul": "^0.4",
-    "mocha": "^4.0.1"
+    "hapi": "^17",
+    "mocha": "^4",
+    "nyc": "^11"
   },
   "peerDependencies": {
-    "hapi": ">=15 <17"
+    "hapi": ">=17 <18"
   }
 }

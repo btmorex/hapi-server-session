@@ -26,7 +26,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "hoek": ">=2 <6"
+    "hoek": ">=5.0.1 <6"
   },
   "devDependencies": {
     "chai": "^4",

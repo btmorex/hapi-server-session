@@ -26,13 +26,13 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "hoek": ">=5.0.1 <6"
+    "hoek": ">=5.0.3 <6"
   },
   "devDependencies": {
     "chai": "^4",
     "coveralls": "^3",
     "hapi": "^17",
-    "mocha": "^4",
+    "mocha": "^5",
     "nyc": "^11"
   },
   "peerDependencies": {

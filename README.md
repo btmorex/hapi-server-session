@@ -56,7 +56,8 @@ main().catch(console.error);
     - `segment`: [Default: `'session'`] session cache segment
 - `cookie`: supports the same options as [`server.state(name, [options])`](https://hapijs.com/api#server.state())
     - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
-    - `ttl`: [Default: session `expiresIn` if set] cookie ttl in milliseconds
+    - `path`: [Default: `'/'`] set the `Path` flag
+    - `ttl`: [Default: session `expiresIn` if set] sets the `Expires` and `Max-Age` flags
 - `expiresIn`: session expiration in milliseconds
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security
@@ -73,6 +74,10 @@ When the session `expiresIn` is set, it defaults both the cookie `ttl` and the c
 More complex configurations are possible. For example, when the session `expiresIn` is set and the cookie `ttl` is explicitly set to `null`, a session will last until the browser is closed, but no longer than `expiresIn` milliseconds.
 
 ## Changes
+
+### [v4.2.0](https://github.com/btmorex/hapi-server-session/compare/v4.1.0...v4.2.0)
+
+- default cookie `path` to `'/'`
 
 ### [v4.1.0](https://github.com/btmorex/hapi-server-session/compare/v4.0.0...v4.1.0)
 

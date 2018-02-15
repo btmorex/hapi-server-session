@@ -79,7 +79,7 @@ describe('when key is set', () => {
           expect(res.request.session).to.deep.equal({test: '1'});
           expect(res.statusCode).to.equal(200);
           expect(res.headers['set-cookie']).to.exist;
-          expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{64}; Secure; HttpOnly/);
+          expect(res.headers['set-cookie'][0]).to.match(/^id=[0-9A-Za-z_-]{64}; Secure; HttpOnly; SameSite=Lax; Path=\/$/);
         })
       );
       describe('and creating id fails', () => {
@@ -157,7 +157,7 @@ describe('when key is set', () => {
             expect(res.request.session).to.deep.equal({test: '1'});
             expect(res.statusCode).to.equal(200);
             expect(res.headers['set-cookie']).to.exist;
-            expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{75}; Max-Age=1; Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT; Secure; HttpOnly/);
+            expect(res.headers['set-cookie'][0]).to.match(/^id=[0-9A-Za-z_-]{75}; Max-Age=1; Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT; Secure; HttpOnly; SameSite=Lax; Path=\/$/);
           })
         );
       });
@@ -174,7 +174,7 @@ describe('when key is not set', () => {
           expect(res.request.session).to.deep.equal({test: '1'});
           expect(res.statusCode).to.equal(200);
           expect(res.headers['set-cookie']).to.exist;
-          expect(res.headers['set-cookie'][0]).to.match(/id=[0-9A-Za-z_-]{22}; Max-Age=1; Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT; Secure; HttpOnly/);
+          expect(res.headers['set-cookie'][0]).to.match(/^id=[0-9A-Za-z_-]{22}; Max-Age=1; Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT; Secure; HttpOnly; SameSite=Lax; Path=\/$/);
         })
       );
     });
@@ -214,7 +214,7 @@ describe('when key is not set', () => {
               expect(res.request.session).to.deep.equal({});
               expect(res.statusCode).to.equal(200);
               expect(res.headers['set-cookie']).to.exist;
-              expect(res.headers['set-cookie'][0]).to.equal('id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Lax');
+              expect(res.headers['set-cookie'][0]).to.equal('id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Lax; Path=/');
             }
           })
         );

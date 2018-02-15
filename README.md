@@ -56,7 +56,7 @@ main().catch(console.error);
     - `segment`: [Default: `'session'`] session cache segment
 - `cookie`: supports the same options as [`server.state(name, [options])`](https://hapijs.com/api#server.state())
     - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
-    - `path`: [Default: `'/'`] set the `Path` flag
+    - `path`: [Default: `'/'`] sets the `Path` flag
     - `ttl`: [Default: session `expiresIn` if set] sets the `Expires` and `Max-Age` flags
 - `expiresIn`: session expiration in milliseconds
 - `name`: [Default: `'id'`] name of the cookie

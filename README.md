@@ -28,7 +28,7 @@ const main = async () => {
     plugin: require('hapi-server-session'),
     options: {
       cookie: {
-        isSecure: false,
+        isSecure: false, // never set to false in production
       },
     },
   });
@@ -51,22 +51,38 @@ main().catch(console.error);
 ## Options
 
 - `algorithm`: [Default: `'sha256'`] algorithm to use during signing
-- `cache`: supports the same options as [`server.cache(options)`](http://hapijs.com/api#servercacheoptions)
-    - `expiresIn`: [Default: session id `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
+- `cache`: supports the same options as [`server.cache(options)`](https://hapijs.com/api#server.cache())
+    - `expiresIn`: [Default: session `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
     - `segment`: [Default: `'session'`] session cache segment
-- `cookie`: supports the same options as [`server.state(name, [options])`](http://hapijs.com/api#serverstatename-options)
+- `cookie`: supports the same options as [`server.state(name, [options])`](https://hapijs.com/api#server.state())
     - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
-- `expiresIn`: session id expiration in milliseconds. Prevents intercepted cookies from working perpetually. Requires `key`
+    - `ttl`: [Default: session `expiresIn` if set] cookie ttl in milliseconds
+- `expiresIn`: session expiration in milliseconds
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security
 - `size`: [Default: `16`] number of random bytes in the session id
 
+## Questions
+
+### Can you explain what the `expiresIn` and `ttl` options do?
+
+When the session `expiresIn` is not set, the cookie `ttl` is not set and the cache `expiresIn` is `2147483647`. This creates a true session cookie, i.e. one that is deleted when the browser is closed, but will last forever otherwise. This is the default with no configuration.
+
+When the session `expiresIn` is set, it defaults both the cookie `ttl` and the cache `expiresIn` to the same value. This creates a session that will last `expiresIn` milliseconds. Even if the cookie `ttl` is ignored by the browser, the server-side cache will expire.
+
+More complex configurations are possible. For example, when the session `expiresIn` is set and the cookie `ttl` is explicitly set to `null`, a session will last until the browser is closed, but no longer than `expiresIn` milliseconds.
+
 ## Changes
 
-### [v4.0.0](https://github.com/btmorex/hapi-server-session/compare/v3.0.2...v4.0.0)
+### [v4.1.0](https://github.com/btmorex/hapi-server-session/compare/v4.0.0...v4.1.0)
+
+- default cookie `ttl` to session `expiresIn`
+- remove `key` requirement on session `expiresIn`
+
+### [v4.0.0](https://github.com/btmorex/hapi-server-session/compare/v3.0.0...v4.0.0)
 
 - support hapi v17
 
-### [v3.0.0](https://github.com/btmorex/hapi-server-session/compare/v2.0.5...v3.0.0)
+### [v3.0.0](https://github.com/btmorex/hapi-server-session/compare/v2.0.0...v3.0.0)
 
 - default `SameSite` flag to `Lax`. Could break sites that require session during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>

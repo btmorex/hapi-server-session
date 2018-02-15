@@ -13,7 +13,7 @@ const main = async () => {
     plugin: require('..'),
     options: {
       cookie: {
-        isSecure: false,
+        isSecure: false, // never set to false in production
       },
     },
   });

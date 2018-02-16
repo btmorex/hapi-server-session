@@ -113,14 +113,15 @@ describe('when key is set', () => {
           })
         );
         describe('and cache is expired', () => {
-          it('should create session and not set cookie', () =>
+          it('should create session and clear cookie', () =>
             runServer({cache: {expiresIn: 1}, expiresIn: 1000, key: 'test'}, async (server) => {
               let res = await server.testInjectWithValue();
               await hoek.wait(1);
               res = await server.testInject({cookie: extractCookie(res)});
               expect(res.request.session).to.deep.equal({});
               expect(res.statusCode).to.equal(200);
-              expect(res.headers['set-cookie']).to.not.exist;
+              expect(res.headers['set-cookie']).to.exist;
+              expect(res.headers['set-cookie'][0]).to.equal('id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Lax; Path=/');
             })
           );
         });

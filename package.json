@@ -23,6 +23,7 @@
   },
   "scripts": {
     "test": "nyc mocha",
+    "codeclimate": "nyc report --reporter=lcov",
     "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {

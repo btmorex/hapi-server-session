@@ -34,7 +34,7 @@
     "coveralls": "^3",
     "hapi": "^17",
     "mocha": "^5",
-    "nyc": "^11"
+    "nyc": "^12"
   },
   "peerDependencies": {
     "hapi": ">=17 <18"

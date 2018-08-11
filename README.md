@@ -6,9 +6,7 @@ Simple server-side session support for hapi
 
 ## Install
 
-
     $ npm install hapi-server-session
-
 
 ## Example
 
@@ -51,13 +49,13 @@ main().catch(console.error);
 ## Options
 
 - `algorithm`: [Default: `'sha256'`] algorithm to use during signing
-- `cache`: supports the same options as [`server.cache(options)`](https://hapijs.com/api#server.cache())
-    - `expiresIn`: [Default: session `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
-    - `segment`: [Default: `'session'`] session cache segment
-- `cookie`: supports the same options as [`server.state(name, [options])`](https://hapijs.com/api#server.state())
-    - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
-    - `path`: [Default: `'/'`] sets the `Path` flag
-    - `ttl`: [Default: session `expiresIn` if set] sets the `Expires` and `Max-Age` flags
+- `cache`: supports the same options as [`server.cache(options)`](<https://hapijs.com/api#server.cache()>)
+  - `expiresIn`: [Default: session `expiresIn` if set or `2147483647`] session cache expiration in milliseconds
+  - `segment`: [Default: `'session'`] session cache segment
+- `cookie`: supports the same options as [`server.state(name, [options])`](<https://hapijs.com/api#server.state()>)
+  - `isSameSite`: [Default: `'Lax'`] sets the `SameSite` flag
+  - `path`: [Default: `'/'`] sets the `Path` flag
+  - `ttl`: [Default: session `expiresIn` if set] sets the `Expires` and `Max-Age` flags
 - `expiresIn`: session expiration in milliseconds
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security

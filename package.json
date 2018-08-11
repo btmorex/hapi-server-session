@@ -22,10 +22,11 @@
     "url": "https://github.com/btmorex/hapi-server-session.git"
   },
   "scripts": {
-    "lint": "eslint --ext .js --ext .json .",
-    "test": "nyc mocha",
     "codeclimate": "nyc report --reporter=lcov",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "lint": "eslint --ext .js --ext .json .",
+    "prettier": "prettier --write **/*.{js,json,md}",
+    "test": "nyc mocha"
   },
   "dependencies": {
     "hoek": ">=5.0.3 <6"
@@ -37,7 +38,8 @@
     "eslint-plugin-json": "^1.2.1",
     "hapi": "^17",
     "mocha": "^5",
-    "nyc": "^12"
+    "nyc": "^12",
+    "prettier": "^1.14.2"
   },
   "peerDependencies": {
     "hapi": ">=17 <18"

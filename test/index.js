@@ -25,7 +25,11 @@ const runServer = async (options, callback) => {
     path: '/test',
     handler: (request, h) => {
       if (request.query.test) {
-        request.session.test = request.query.test;
+        if (request.query.test === 'delete') {
+          delete request.session;
+        } else {
+          request.session.test = request.query.test;
+        }
       }
       return '';
     },
@@ -199,6 +203,27 @@ describe('when key is not set', () => {
             expect(res.request.session).to.deep.equal({test: '2'});
             expect(res.statusCode).to.equal(200);
             expect(res.headers['set-cookie']).to.not.exist;
+          })
+        );
+      });
+      describe('and session is deleted', () => {
+        it('should clear cookie and delete cache', () =>
+          runServer({}, async (server) => {
+            let res = await server.testInjectWithValue();
+            const cookie = extractCookie(res);
+            const key = {
+              id: cookie.split('=')[1],
+              segment: 'session',
+            };
+            let cache = await server._core.caches.get('_default').client.get(key);
+            expect(cache.item).to.deep.equal({test: '1'});
+            res = await server.testInject({cookie: cookie, value: 'delete'});
+            expect(res.request.session).to.be.undefined;
+            expect(res.statusCode).to.equal(200);
+            expect(res.headers['set-cookie']).to.exist;
+            expect(res.headers['set-cookie'][0]).to.equal('id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Lax; Path=/');
+            cache = await server._core.caches.get('_default').client.get(key);
+            expect(cache).to.be.null;
           })
         );
       });

@@ -5,13 +5,15 @@ const hapi = require('hapi');
 const hoek = require('hoek');
 const mocha = require('mocha');
 
+chai.use(require('chai-as-promised'));
+
 const describe = mocha.describe;
 const expect = chai.expect;
 const it = mocha.it;
 
 const extractCookie = (res) => {
-  const cookie = res.headers['set-cookie'][0];
-  return cookie.slice(0, cookie.indexOf(';'));
+  const cookieHeader = res.headers['set-cookie'][0];
+  return cookieHeader.slice(0, cookieHeader.indexOf(';'));
 };
 
 const runServer = async (options, callback) => {
@@ -244,5 +246,35 @@ describe('when key is not set', () => {
           }));
       });
     });
+  });
+});
+
+describe('when rolling is set', () => {
+  describe('and expiresIn is not set', () => {
+    it('should throw during register', () => {
+      expect(runServer({rolling: true})).to.be.rejected;
+    });
+  });
+  describe('and expiresIn is set', () => {
+    it('should refresh expiration', () =>
+      runServer({expiresIn: 10000, key: 'test', rolling: true}, async (server) => {
+        let res = await server.testInjectWithValue();
+        expect(res.headers['set-cookie']).to.exist;
+        let cookieHeader = res.headers['set-cookie'][0];
+        const expires = cookieHeader.match(
+          /Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT;/,
+        )[0];
+        await hoek.wait(1000);
+        res = await server.testInject({cookie: cookieHeader.slice(0, cookieHeader.indexOf(';'))});
+        expect(res.request.session).to.deep.equal({test: '1'});
+        expect(res.statusCode).to.equal(200);
+        expect(res.headers['set-cookie']).to.exist;
+        cookieHeader = res.headers['set-cookie'][0];
+        expect(expires).to.not.equal(
+          cookieHeader.match(
+            /Expires=(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT;/,
+          )[0],
+        );
+      }));
   });
 });

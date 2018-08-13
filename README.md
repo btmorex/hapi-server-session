@@ -101,3 +101,7 @@ will unset the cookie and delete the session from the cache.
 ### [v3.0.0](https://github.com/btmorex/hapi-server-session/compare/v2.0.0...v3.0.0)
 
 - default `SameSite` flag to `Lax`. Could break sites that require session during certain kinds of cross site requests. See <https://www.owasp.org/index.php/SameSite>
+
+## Author
+
+[Avery Fay](https://averyfay.com/)

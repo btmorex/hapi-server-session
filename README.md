@@ -81,6 +81,10 @@ will unset the cookie and delete the session from the cache.
 
 ## Changes
 
+### [v5.0.0](https://github.com/btmorex/hapi-server-session/compare/v4.3.0...v5.0.0)
+
+- support hapi v19
+
 ### [v4.3.0](https://github.com/btmorex/hapi-server-session/compare/v4.2.0...v4.3.0)
 
 - add way to destroy the session

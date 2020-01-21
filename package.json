@@ -1,6 +1,6 @@
 {
   "name": "hapi-server-session",
-  "version": "4.3.2",
+  "version": "5.0.0",
   "description": "Simple server-side session support for hapi",
   "keywords": [
     "hapi",

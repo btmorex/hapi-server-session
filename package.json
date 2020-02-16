@@ -24,7 +24,7 @@
   "scripts": {
     "codeclimate": "nyc report --reporter=lcov",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "lint": "eslint --ext .js --ext .json .",
+    "eslint": "eslint --ext .js --ext .json .",
     "prettier": "prettier --write **/*.{js,json,md}",
     "test": "nyc mocha"
   },

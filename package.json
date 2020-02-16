@@ -16,6 +16,7 @@
     "email": "me@averyfay.com",
     "url": "https://averyfay.com/"
   },
+  "files": [],
   "main": "lib/index.js",
   "repository": {
     "type": "git",

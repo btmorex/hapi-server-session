@@ -13,7 +13,7 @@ Simple server-side session support for hapi
 ```javascript
 'use strict';
 
-const hapi = require('hapi');
+const hapi = require('@hapi/hapi');
 
 const main = async () => {
   const server = new hapi.Server({
@@ -34,7 +34,7 @@ const main = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
+    handler: (request, _h) => {
       request.session.views = request.session.views + 1 || 1;
       return 'Views: ' + request.session.views;
     },
@@ -60,6 +60,7 @@ main().catch(console.error);
 - `name`: [Default: `'id'`] name of the cookie
 - `key`: signing key. Prevents weaknesses in randomness from affecting overall security
 - `size`: [Default: `16`] number of random bytes in the session id
+- `vhost`: [Default: `*`] host or list of hosts that plugin should be enabled for
 
 ## Questions
 
@@ -80,6 +81,10 @@ delete request.session;
 will unset the cookie and delete the session from the cache.
 
 ## Changes
+
+### [v5.1.0](https://github.com/btmorex/hapi-server-session/compare/v5.0.0...v5.1.0)
+
+- support vhost option
 
 ### [v5.0.0](https://github.com/btmorex/hapi-server-session/compare/v4.3.0...v5.0.0)
 

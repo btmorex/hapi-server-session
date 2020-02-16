@@ -1,6 +1,6 @@
 'use strict';
 
-const hapi = require('hapi');
+const hapi = require('@hapi/hapi');
 
 const main = async () => {
   const server = new hapi.Server({
@@ -21,7 +21,7 @@ const main = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
+    handler: (request, _h) => {
       request.session.views = request.session.views + 1 || 1;
       return 'Views: ' + request.session.views;
     },

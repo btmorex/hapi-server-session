@@ -8,6 +8,7 @@ const mocha = require('mocha');
 const describe = mocha.describe;
 const expect = chai.expect;
 const it = mocha.it;
+const should = chai.should();
 
 const extractCookie = (res) => {
   const cookie = res.headers['set-cookie'][0];
@@ -20,40 +21,42 @@ const runServer = async (options, callback) => {
     address: '127.0.0.1',
   });
 
-  server.route({
-    method: 'GET',
-    path: '/test',
-    handler: (request, h) => {
-      if (request.query.test) {
-        if (request.query.test === 'delete') {
-          delete request.session;
-        } else {
-          request.session.test = request.query.test;
+  server.route([
+    {
+      method: 'GET',
+      path: '/test',
+      handler: (request, _h) => {
+        if (request.query.test) {
+          if (request.query.test === 'delete') {
+            delete request.session;
+          } else {
+            request.session.test = request.query.test;
+          }
         }
-      }
-      return '';
+        return '';
+      },
     },
-  });
+  ]);
 
   await server.register({plugin: require('..'), options});
 
   server.decorate('server', 'testInject', (options) => {
     options = options || {};
-    let url = '/test';
+    let url = (options.host ? 'http://' + options.host : '') + '/test';
     if (options.value) {
       url += '?test=' + options.value;
     }
     const headers = options.cookie ? {cookie: options.cookie} : {};
     return server.inject({url: url, headers: headers});
   });
-  server.decorate('server', 'testInjectWithValue', () => server.testInject({value: '1'}));
-  server.decorate('server', 'testInjectWithCookie', async () => {
-    const res = await server.testInjectWithValue();
-    return server.testInject({cookie: extractCookie(res)});
+  server.decorate('server', 'testInjectWithValue', (options) => server.testInject({...options, value: '1'}));
+  server.decorate('server', 'testInjectWithCookie', async (options) => {
+    const res = await server.testInjectWithValue(options);
+    return server.testInject({...options, cookie: extractCookie(res)});
   });
-  server.decorate('server', 'testInjectWithCookieAndValue', async () => {
-    const res = await server.testInjectWithValue();
-    return server.testInject({cookie: extractCookie(res), value: '2'});
+  server.decorate('server', 'testInjectWithCookieAndValue', async (options) => {
+    const res = await server.testInjectWithValue(options);
+    return server.testInject({...options, cookie: extractCookie(res), value: '2'});
   });
 
   await server.start();
@@ -244,5 +247,26 @@ describe('when key is not set', () => {
           }));
       });
     });
+  });
+});
+
+describe('when vhost is set', () => {
+  describe('and vhost includes host', () => {
+    it('should create session', () =>
+      runServer({vhost: 'localhost'}, async (server) => {
+        const res = await server.testInject();
+        expect(res.request.session).to.deep.equal({});
+        expect(res.statusCode).to.equal(204);
+        expect(res.headers['set-cookie']).to.not.exist;
+      }));
+  });
+  describe('and vhost does not include host', () => {
+    it('should not create session', () =>
+      runServer({vhost: ['localhost']}, async (server) => {
+        const res = await server.testInject({host: 'example.com'});
+        should.not.exist(res.request.session);
+        expect(res.statusCode).to.equal(204);
+        expect(res.headers['set-cookie']).to.not.exist;
+      }));
   });
 });

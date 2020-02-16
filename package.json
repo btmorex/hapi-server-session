@@ -34,7 +34,7 @@
     "@hapi/hoek": "^9.0.0"
   },
   "devDependencies": {
-    "@hapi/hapi": "^19.1.1",
+    "@hapi/hapi": "^18.4.1",
     "chai": "^4.2.0",
     "coveralls": "^3.0.9",
     "eslint": "^6.8.0",

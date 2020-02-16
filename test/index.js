@@ -19,6 +19,11 @@ const runServer = async (options, callback) => {
   const server = new hapi.Server({
     host: 'localhost',
     address: '127.0.0.1',
+    routes: {
+      response: {
+        emptyStatusCode: 204,
+      },
+    },
   });
 
   server.route([

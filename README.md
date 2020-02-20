@@ -8,6 +8,10 @@ Simple server-side session support for hapi
 
     $ npm install hapi-server-session
 
+**For typescript users:**
+
+    $ npm install @types/hapi-server-session
+
 ## Example
 
 ```javascript
